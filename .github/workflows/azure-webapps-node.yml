@@ -93,8 +93,10 @@ jobs:
         echo "myprod env var is ${{vars.MYPROD_ENV_VAR1}}"
         echo "myprod env var is ${{vars.MYPROD_ENV_VAR2}}"
         echo "REPO_VAR env var is ${{vars.REPO_VAR}}"
+
+    - name: Download artifact from build job
+      uses: SankumSan/github-actions/.github/actions/action.yml@main
         
-    
     - name: Download artifact from build job
       if: false
       uses: actions/download-artifact@v4
