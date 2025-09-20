@@ -12,6 +12,6 @@ runs:
      run: |
        echo "Hello from compo 1"
        echo "comp1=World" >> $GITHUB_STATE
-     post: |
-       shell: pwsh
-       echo "post post, $comp1"
+     #post: | composite does not support this
+     #  shell: pwsh
+     #  echo "post post, $comp1"
