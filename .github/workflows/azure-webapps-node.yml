@@ -92,6 +92,8 @@ jobs:
         echo "my env prod sjadas"
         echo "myprod env var is ${{vars.MYPROD_ENV_VAR1}}"
         echo "myprod env var is ${{vars.MYPROD_ENV_VAR2}}"
+        echo "REPO_VAR env var is ${{vars.REPO_VAR}}"
+        
     
     - name: Download artifact from build job
       if: false
