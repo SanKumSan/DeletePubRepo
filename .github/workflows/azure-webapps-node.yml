@@ -70,7 +70,13 @@ jobs:
           echo "ENVIRONMENT_NAME=dev" >> $GITHUB_ENV #retrieve secrets from 'dev' environment in Github
       - name: Set output
         id: set_env
-        run: echo "::set-output name=current_env::${{ env.ENVIRONMENT_NAME }}" #assign the value of ENVIRONMENT_NAME to the output variable 'current_env' 
+        run: |
+          echo "azz=statestate" >> GITHUB_STATE
+          # echo "::set-output name=current_env::${{ env.ENVIRONMENT_NAME }}" #assign the value of ENVIRONMENT_NAME to the output variable 'current_env'
+      - name: Set output2
+        run: |
+          echo "azzzzzzz value is $azz"
+        
   deploy:
     permissions:
       contents: none
