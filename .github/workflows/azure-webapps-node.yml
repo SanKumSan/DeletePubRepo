@@ -82,8 +82,8 @@ jobs:
     permissions:
       contents: none
     runs-on: ubuntu-latest
-    environment:
-      name: 'MyProd'
+    #environment:
+    #  name: 'MyProd'
     steps:
     - name: Download artifact from build job
       run: |
@@ -95,7 +95,7 @@ jobs:
         echo "REPO_VAR env var is ${{vars.REPO_VAR}}"
 
     - name: Download artifact from build job
-      uses: SankumSan/github-actions/.github/actions/action.yml@main
+      uses: ./.github/actions #SankumSan/github-actions/.github/actions/action.yml@main
         
     - name: Download artifact from build job
       if: false
