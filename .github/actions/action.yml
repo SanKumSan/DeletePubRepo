@@ -1,0 +1,12 @@
+name: "Example Action"
+inputs:{}
+outputs:{}
+runs:
+  using: "composite"
+  steps:
+  -  name: compo1
+     run: |
+       echo "Hello from compo 1"
+       echo "comp1=World" >> $GITHUB_STATE
+     post: |
+       echo "post post, $comp1"
