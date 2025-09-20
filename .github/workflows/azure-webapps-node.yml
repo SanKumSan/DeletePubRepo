@@ -67,7 +67,8 @@ jobs:
       - name: Check if dev
         if: endsWith(github.ref, '/dev') #if the triggering branch is 'dev'
         run: |
-          echo "ENVIRONMENT_NAME=dev" >> $GITHUB_ENV #retrieve secrets from 'dev' environment in Github
+          #echo "ENVIRONMENT_NAME=dev" >> $GITHUB_ENV #retrieve secrets from 'dev' environment in Github
+          echo "ENVIRONMENT_NAME=dev" >> $GITHUB_OUTPUT
       - name: Set output
         id: set_env
         run: |
@@ -75,7 +76,7 @@ jobs:
           # echo "::set-output name=current_env::${{ env.ENVIRONMENT_NAME }}" #assign the value of ENVIRONMENT_NAME to the output variable 'current_env'
       - name: Set output2
         run: |
-          echo "azzzzzzz value is $azz"
+          echo "azzzzzzz ghenv value is $azz"
         
   deploy:
     permissions:
@@ -85,7 +86,12 @@ jobs:
       name: 'MyProd'
     steps:
     - name: Download artifact from build job
-      run: echo "my enf prov sjadas"
+      run: |
+        echo "my env prod sjadas"
+        echo "my env prod sjadas"
+        echo "my env prod sjadas"
+        echo "myprod env var is ${{vars.MYPROD_ENV_VAR1}}"
+        echo "myprod env var is ${{vars.MYPROD_ENV_VAR2}}"
     
     - name: Download artifact from build job
       if: false
