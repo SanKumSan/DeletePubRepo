@@ -8,8 +8,10 @@ runs:
   using: "composite"
   steps:
   -  name: Test Post Action
+     shell: pwsh
      run: |
        echo "Hello from compo 1"
        echo "comp1=World" >> $GITHUB_STATE
      post: |
+       shell: pwsh
        echo "post post, $comp1"
