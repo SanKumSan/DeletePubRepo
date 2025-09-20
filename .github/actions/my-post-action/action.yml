@@ -1,6 +1,9 @@
 name: "Example Action"
-inputs:{}
-outputs:{}
+inputs:
+  name:
+    description: "The name to greet"
+    required: false
+    
 runs:
   using: "composite"
   steps:
