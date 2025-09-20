@@ -85,6 +85,7 @@ jobs:
     #environment:
     #  name: 'MyProd'
     steps:
+    - uses: actions/checkout@v4
     - name: Download artifact from build job
       run: |
         echo "my env prod sjadas"
