@@ -84,8 +84,6 @@ jobs:
     needs: build
     environment:
       name: 'MyProd'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
     steps:
     - name: Download artifact from build job
       run: echo "my enf prov sjadas"
