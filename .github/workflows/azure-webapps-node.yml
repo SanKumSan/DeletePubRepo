@@ -95,7 +95,7 @@ jobs:
         echo "REPO_VAR env var is ${{vars.REPO_VAR}}"
 
     - name: Download artifact from build job
-      uses: ./.github/actions #SankumSan/github-actions/.github/actions/action.yml@main
+      uses: ./.github/actions/action #SankumSan/github-actions/.github/actions/action.yml@main
         
     - name: Download artifact from build job
       if: false
