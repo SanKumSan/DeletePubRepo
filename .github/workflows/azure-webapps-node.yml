@@ -108,6 +108,8 @@ jobs:
     - name: Download artifact from build job
       if: true
       uses: ./.github/actions/my-post-action
+      with:
+        name: testpostactions
         
     - name: Upload artifact from build job
       if: true
