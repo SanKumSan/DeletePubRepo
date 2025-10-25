@@ -32,16 +32,17 @@ permissions:
 
 jobs:
   build:
-    if: false
+    if: true
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Set up Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
+        package-manager-cache: true
 
     - name: npm install, build, and test
       run: |
@@ -85,13 +86,11 @@ jobs:
     #environment:
     #  name: 'MyProd'
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Download artifact from build job
       id: get_step
       run: |
-        echo "my env prod sjadas"
-        echo "my env prod sjadas"
-        echo "my env prod sjadas"
+        echo "my env prod var test"
         echo "myprod env var is ${{vars.MYPROD_ENV_VAR1}}"
         echo "myprod env var is ${{vars.MYPROD_ENV_VAR2}}"
         echo "REPO_VAR env var is ${{vars.REPO_VAR}}"
@@ -99,6 +98,7 @@ jobs:
         echo "printing directly from the file mate $(cat ./.github/actions/my-post-action/cleanup.js)"
 
     - name: Download artifact from build job
+      if: false
       uses: ./.github/actions/my-post-action
         
     - name: Download artifact from build job
