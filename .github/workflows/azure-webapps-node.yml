@@ -86,8 +86,8 @@ jobs:
     #environment:
     #  name: 'MyProd'
     steps:
-    - uses: actions/checkout@v5
-    - name: Download artifact from build job
+    - name: Checkout
+      uses: actions/checkout@v5
       id: get_step
       run: |
         echo "my env prod var test"

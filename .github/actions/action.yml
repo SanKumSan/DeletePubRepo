@@ -1,12 +1,19 @@
 name: "Example Action"
-inputs:{}
-outputs:{}
+inputs:
+  name:
+    description: "The name to greet"
+    required: false
+outputs:
+  comp1:
+    description: "Value from composite step"
 runs:
   using: "composite"
   steps:
-  -  name: compo1
+  -  name: Post Action Composite Step
+     shell: pwsh
      run: |
        echo "Hello from compo 1"
        echo "comp1=World" >> $GITHUB_STATE
+       echo "var written to state"
      post: |
        echo "post post, $comp1"
