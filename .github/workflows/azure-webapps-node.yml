@@ -1,172 +1,68 @@
-# This workflow will build and push a node.js application to an Azure Web App when a commit is pushed to your default branch.
-#
-# This workflow assumes you have already created the target Azure App Service web app.
-# For instructions see https://docs.microsoft.com/en-us/azure/app-service/quickstart-nodejs?tabs=linux&pivots=development-environment-cli
-#
-# To configure this workflow:
-#
-# 1. Download the Publish Profile for your Azure Web App. You can download this file from the Overview page of your Web App in the Azure Portal.
-#    For more information: https://docs.microsoft.com/en-us/azure/app-service/deploy-github-actions?tabs=applevel#generate-deployment-credentials
-#
-# 2. Create a secret in your repository named AZURE_WEBAPP_PUBLISH_PROFILE, paste the publish profile contents as the value of the secret.
-#    For instructions on obtaining the publish profile see: https://docs.microsoft.com/azure/app-service/deploy-github-actions#configure-the-github-secret
-#
-# 3. Change the value for the AZURE_WEBAPP_NAME. Optionally, change the AZURE_WEBAPP_PACKAGE_PATH and NODE_VERSION environment variables below.
-#
-# For more information on GitHub Actions for Azure: https://github.com/Azure/Actions
-# For more information on the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
-
+name: Publish and Delete Cache Workflow
 on:
   push:
     branches: [ "main" ]
   workflow_dispatch:
-
 env:
-  AZURE_WEBAPP_NAME: your-app-name    # set this to your application's name
-  AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
-  NODE_VERSION: '20.x'                # set this to the node version to use
-
-permissions:
-  contents: read
-
+  PUBLISH_DIR: 'publish'  # Directory to publish
 jobs:
-  build:
-    if: false
+  publish:
+    runs-on: windows-latest
+    outputs:
+      cache-key: ${{ steps.set-cache.outputs.cache-key }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Create static artifact if nothing was downloaded
+        run: |
+            echo "Publishing application..."
+            mkdir -p $PUBLISH_DIR
+            echo "Sample content" > $PUBLISH_DIR/index.html
+            echo "Published to $PUBLISH_DIR"
+
+      - name: Cache publish folder
+        id: set-cache
+        uses: actions/cache@v4
+        with:
+          path: publish
+          key: publish-${{ github.sha }}
+          restore-keys: publish-
+
+  upload:
+    needs: publish
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+      - name: Checkout code
+        uses: actions/checkout@v5
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v6
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
-        package-manager-cache: true
+      - name: Restore publish cache
+        if: needs.publish.outputs.cache-key != ''
+        uses: actions/cache@v4
+        with:
+          path: publish
+          key: ${{ needs.publish.outputs.cache-key }}
+          restore-keys: publish-
 
-    - name: npm install, build, and test
-      run: |
-        npm install
-        npm run build --if-present
-        npm run test --if-present
-
-    - name: Upload artifact for deployment job
-      uses: actions/upload-artifact@v4
-      with:
-        name: node-app
-        path: .
-        
-  set-environment: #this is a job named 'set-environment'
-    runs-on: ubuntu-latest #your preferred OS
-    outputs: #the env value needs to be exposed as an output in order to be reached from other jobs
-      current_env: ${{ steps.set_env.outputs.current_env }} #output variable to store the relevant environment
-    steps:
-      - name: Check if prod
-        if: endsWith(github.ref, '/main') #if the triggering branch is 'main'
+      - name: Verify publish folder
         run: |
-          echo "ENVIRONMENT_NAME=MyProd" >> $GITHUB_ENV #retrieve secrets from 'prod' environment in Github
-      - name: Check if dev
-        #if: endsWith(github.ref, '/dev') #if the triggering branch is 'dev'
+          echo "Contents of publish directory:"
+          ls -la publish
+
+      - name: Upload artifact from build job
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-app
+          path: node-app.zip
+
+      - name: Delete cache after successful upload
+        if: success() && needs.publish.outputs.cache-key != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CACHE_KEY: ${{ needs.publish.outputs.cache-key }}
         run: |
-          #echo "ENVIRONMENT_NAME=dev" >> $GITHUB_ENV #retrieve secrets from 'dev' environment in Github
-          echo "ENVIRONMENT_NAME=dev" >> $GITHUB_OUTPUT
-      - name: Set output
-        id: set_env
-        run: |
-          echo "azz=statestate" >> GITHUB_STATE
-          # echo "::set-output name=current_env::${{ env.ENVIRONMENT_NAME }}" #assign the value of ENVIRONMENT_NAME to the output variable 'current_env'
-      - name: Set output2
-        run: |
-          echo "azzzzzzz ghenv value is $azz"
-          echo "azzzzzzz ghenv value is $ENVIRONMENT_NAME"
-      - name: Set repo var
-        run: |
-          echo "run id for workflow is $GITHUB_RUN_ID"        
-  deploy:
-    needs: set-environment
-    permissions:
-      contents: none
-    runs-on: ubuntu-latest
-    #environment:
-    #  name: 'MyProd'
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v5
-
-    - name: Try download artifact from build job (non-fatal)
-      id: download_artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: node-app
-        path: ./
-      continue-on-error: true # do not fail the job if the artifact is not found
-
-    - name: Extract downloaded artifact if it exists
-      id: extract
-      run: |
-        if [ -f node-app.zip ]; then
-          echo "Extracting downloaded artifact..."
-          mkdir -p ./artifact
-          cd ./artifact
-          unzip ../node-app.zip
-          cd ..
-          echo "Extracted contents:"
-          ls -la ./artifact
-          echo "artifact_exists=true" >> $GITHUB_OUTPUT
-        else
-          echo "No zip file found to extract"
-          echo "artifact_exists=false" >> $GITHUB_OUTPUT
-        fi
-
-    - name: Create static artifact if nothing was downloaded
-      run: |
-        echo "run id for workflow is $GITHUB_RUN_ID"
-        if [ -d ./artifact ] && [ "$(ls -A ./artifact)" ]; then
-          echo "Artifact directory already populated by download; skipping creation"
-          ls -la ./artifact || true
-        else
-          echo "No artifact found from build job; creating static artifact"
-          mkdir -p ./artifact/static
-          echo "Hello from GitHub Actions" > ./artifact/static/hello.txt
-          echo "Created artifact files:"
-          ls -la ./artifact/static
-        fi
-
-    - name: test post actions job
-      # if: steps.check_artifact.outputs.artifact_present == 'false'
-      uses: ./.github/actions/my-post-action
-      with:
-        name: testpostactions
-
-    - name: Compress artifact directory
-      run: |
-        echo "Compressing artifact directory..."
-        cd ./artifact
-        zip -r ../node-app.zip .
-        cd ..
-        echo "Compressed size"
-        ls -lh node-app.zip
-        
-    - name: Upload artifact from build job
-      #if: steps.check_artifact.outputs.artifact_present == 'true'
-      uses: actions/upload-artifact@v4
-      with:
-        name: node-app
-        path: node-app.zip
-    
-    # - name: Download artifact from build job
-    #   #if: steps.check_artifact.outputs.artifact_present == 'true'
-    #   uses: actions/download-artifact@v4
-    #   with:
-    #     name: node-app
-
-    - name: 'Deploy to Azure WebApp'
-      if: true
-      id: deploy-to-webapp
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-    outputs: # step ooutput is for the whole step mate
-        current_step: ${{ steps.get_step.outputs.current_step }}
+          echo "Deleting cache with key: $CACHE_KEY"
+          curl -s -X DELETE \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/caches/${CACHE_KEY}"
