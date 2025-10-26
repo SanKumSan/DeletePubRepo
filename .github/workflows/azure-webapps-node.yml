@@ -9,7 +9,7 @@ jobs:
   publish:
     runs-on: windows-latest
     outputs:
-      cache-key: ${{ steps.set-cache.outputs.cache-key }}
+      cache-key: ${{ steps.set-cache1.outputs.cache-primary }} # Changed to match the cache step ID
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -28,12 +28,7 @@ jobs:
           path: ${{ env.PUBLISH_DIR }}
           key: publish-${{ github.sha }}
           restore-keys: publish-
-
-      # Set the cache key as an output
-      - name: Set cache key output
-        run: |
-          echo "cache-key=publish-${{ github.sha }}" >> $GITHUB_OUTPUT
-        id: set-cache
+        # Removing the separate output step as we'll use the cache action's output directly
 
   upload:
     needs: publish
@@ -42,10 +37,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      #print cache output for debugging
-      - name: Print cache key
+      # Print detailed cache debugging info
+      - name: Print cache details
         run: |
-          echo "Cache Key: ${{ needs.publish.outputs.cache-key }}"
+          echo "Cache Key from publish job: ${{ needs.publish.outputs.cache-key }}"
+          echo "Expected Cache Key: publish-${{ github.sha }}"
+          echo "GitHub SHA: ${{ github.sha }}"
 
       - name: Restore publish cache
         if: needs.publish.outputs.cache-key != ''
