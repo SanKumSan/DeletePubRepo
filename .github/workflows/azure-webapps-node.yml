@@ -45,11 +45,11 @@ jobs:
           echo "GitHub SHA: ${{ github.sha }}"
 
       - name: Restore publish cache
-        if: needs.publish.outputs.cache-key != ''
+        #if: needs.publish.outputs.cache-key != ''
         uses: actions/cache@v4
         with:
           path: ${{ env.PUBLISH_DIR }}
-          key: ${{ needs.publish.outputs.cache-key }}
+          key: publish-${{ github.sha }} #${{ needs.publish.outputs.cache-key }}
           restore-keys: publish-
 
       - name: Verify publish folder
