@@ -22,7 +22,7 @@ jobs:
           echo "Published to ./${{ env.PUBLISH_DIR }}"
 
       - name: Cache publish folder
-        id: set-cache
+        id: set-cache1
         uses: actions/cache@v4
         with:
           path: ${{ env.PUBLISH_DIR }}
