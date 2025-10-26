@@ -144,7 +144,7 @@ jobs:
         cd ./artifact
         zip -r ../node-app.zip .
         cd ..
-        echo "Compressed size:"
+        echo "Compressed size"
         ls -lh node-app.zip
         
     - name: Upload artifact from build job
