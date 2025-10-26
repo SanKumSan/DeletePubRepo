@@ -36,6 +36,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
+      #print cache output for debugging
+      - name: Print cache key
+        run: |
+          echo "Cache Key: ${{ needs.publish.outputs.cache-key }}"
+
       - name: Restore publish cache
         if: needs.publish.outputs.cache-key != ''
         uses: actions/cache@v4
