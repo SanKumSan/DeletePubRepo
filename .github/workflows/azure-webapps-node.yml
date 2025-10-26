@@ -28,8 +28,8 @@ jobs:
         id: set-cache
         uses: actions/cache@v4
         with:
-          path: publish
-          key: publish-${{ github.sha }}
+          path: publish_DIR1
+          key: publish_DIR1-${{ github.sha }}
           restore-keys: publish_DIR1-
 
   upload:
