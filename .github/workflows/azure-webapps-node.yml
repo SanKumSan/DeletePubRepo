@@ -80,6 +80,7 @@ jobs:
           echo "azzzzzzz ghenv value is $azz"
         
   deploy:
+    needs: set-environment
     permissions:
       contents: none
     runs-on: ubuntu-latest
