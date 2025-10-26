@@ -19,7 +19,7 @@ jobs:
           publish_DIR1: ${{ env.PUBLISH_DIR }}
         run: |
             echo "Publishing application..."
-            mkdir -p $publish_DIR1
+            mkdir -p ./$publish_DIR1
             echo "Sample content" > $publish_DIR1/index.html
             echo "Published to $publish_DIR1"
 
