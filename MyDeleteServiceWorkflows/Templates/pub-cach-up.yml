@@ -1,0 +1,68 @@
+name: Publish and Delete Cache Workflow
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+env:
+  PUBLISH_DIR: 'publish'  # Directory to publish
+jobs:
+  publish:
+    runs-on: windows-latest
+    outputs:
+      cache-key: ${{ steps.set-cache.outputs.cache-key }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Create static artifact if nothing was downloaded
+        run: |
+            echo "Publishing application..."
+            mkdir -p $PUBLISH_DIR
+            echo "Sample content" > $PUBLISH_DIR/index.html
+            echo "Published to $PUBLISH_DIR"
+
+      - name: Cache publish folder
+        id: set-cache
+        uses: actions/cache@v4
+        with:
+          path: publish
+          key: publish-${{ github.sha }}
+          restore-keys: publish-
+
+  upload:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Restore publish cache
+        if: needs.publish.outputs.cache-key != ''
+        uses: actions/cache@v4
+        with:
+          path: publish
+          key: ${{ needs.publish.outputs.cache-key }}
+          restore-keys: publish-
+
+      - name: Verify publish folder
+        run: |
+          echo "Contents of publish directory:"
+          ls -la publish
+
+      - name: Upload artifact from build job
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-app
+          path: node-app.zip
+
+      - name: Delete cache after successful upload
+        if: success() && needs.publish.outputs.cache-key != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CACHE_KEY: ${{ needs.publish.outputs.cache-key }}
+        run: |
+          echo "Deleting cache with key: $CACHE_KEY"
+          curl -s -X DELETE \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/caches/${CACHE_KEY}"
