@@ -126,7 +126,7 @@ jobs:
         name: node-app
 
     - name: 'Deploy to Azure WebApp'
-      if: false
+      if: true
       id: deploy-to-webapp
       uses: azure/webapps-deploy@v2
       with:
