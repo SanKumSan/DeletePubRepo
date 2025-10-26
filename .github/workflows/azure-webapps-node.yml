@@ -22,6 +22,7 @@ jobs:
           echo "Published to ./${{ env.PUBLISH_DIR }}"
 
       - name: Cache publish folder
+        if: false
         id: set-cache1
         uses: actions/cache@v4
         with:
@@ -48,7 +49,7 @@ jobs:
         #if: needs.publish.outputs.cache-key != ''
         uses: actions/cache@v4
         with:
-          key: publish-${{ github.sha }} #${{ needs.publish.outputs.cache-key }}
+          key: publish-2c114ba283895a804d2c845504d2e4ad5d0d3e05 #publish-${{ github.sha }} #${{ needs.publish.outputs.cache-key }}
           path: ${{ env.PUBLISH_DIR }}
 
       - name: Verify publish folder
