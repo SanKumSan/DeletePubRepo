@@ -66,7 +66,7 @@ jobs:
         run: |
           echo "ENVIRONMENT_NAME=MyProd" >> $GITHUB_ENV #retrieve secrets from 'prod' environment in Github
       - name: Check if dev
-        if: endsWith(github.ref, '/dev') #if the triggering branch is 'dev'
+        #if: endsWith(github.ref, '/dev') #if the triggering branch is 'dev'
         run: |
           #echo "ENVIRONMENT_NAME=dev" >> $GITHUB_ENV #retrieve secrets from 'dev' environment in Github
           echo "ENVIRONMENT_NAME=dev" >> $GITHUB_OUTPUT
@@ -78,7 +78,10 @@ jobs:
       - name: Set output2
         run: |
           echo "azzzzzzz ghenv value is $azz"
-        
+          echo "azzzzzzz ghenv value is $ENVIRONMENT_NAME"
+      - name: Set repo var
+        run: |
+          echo "run id for workflow is $GITHUB_RUN_ID"        
   deploy:
     needs: set-environment
     permissions:
