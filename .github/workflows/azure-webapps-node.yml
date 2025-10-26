@@ -15,22 +15,19 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Create static artifact if nothing was downloaded
-        env:
-          publish_DIR1: ${{ env.PUBLISH_DIR }}
         run: |
-          echo " print publish_DIR1 $publish_DIR1"
-            echo "Publishing application..."
-            mkdir -p ./publish_DIR1
-            echo "Sample content" > ./publish_DIR1/index.html
-            echo "Published to ./publish_DIR1"
+          echo "Publishing application..."
+          mkdir -p ./${{ env.PUBLISH_DIR }}
+          echo "Sample content" > ./${{ env.PUBLISH_DIR }}/index.html
+          echo "Published to ./${{ env.PUBLISH_DIR }}"
 
       - name: Cache publish folder
         id: set-cache
         uses: actions/cache@v4
         with:
-          path: publish_DIR1
-          key: publish_DIR1-${{ github.sha }}
-          restore-keys: publish_DIR1-
+          path: ${{ env.PUBLISH_DIR }}
+          key: publish-${{ github.sha }}
+          restore-keys: publish-
 
   upload:
     needs: publish
@@ -43,14 +40,14 @@ jobs:
         if: needs.publish.outputs.cache-key != ''
         uses: actions/cache@v4
         with:
-          path: publish
+          path: ${{ env.PUBLISH_DIR }}
           key: ${{ needs.publish.outputs.cache-key }}
           restore-keys: publish-
 
       - name: Verify publish folder
         run: |
           echo "Contents of publish directory:"
-          ls -la publish
+          ls -la ${{ env.PUBLISH_DIR }}
 
       - name: Upload artifact from build job
         uses: actions/upload-artifact@v4
