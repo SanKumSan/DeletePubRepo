@@ -48,9 +48,7 @@ jobs:
         #if: needs.publish.outputs.cache-key != ''
         uses: actions/cache@v4
         with:
-          path: ${{ env.PUBLISH_DIR }}
           key: publish-${{ github.sha }} #${{ needs.publish.outputs.cache-key }}
-          restore-keys: publish-
 
       - name: Verify publish folder
         run: |
