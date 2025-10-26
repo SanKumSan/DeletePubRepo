@@ -95,6 +95,7 @@ jobs:
     - name: Just Run Mate
       id: get_step
       run: |
+        echo "run id for workflow is $GITHUB_RUN_ID"  
         echo "my env prod var test"
         echo "myprod env var is ${{vars.MYPROD_ENV_VAR1}}"
         echo "myprod env var is ${{vars.MYPROD_ENV_VAR2}}"
