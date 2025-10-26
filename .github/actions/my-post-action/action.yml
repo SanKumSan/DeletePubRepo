@@ -1,4 +1,5 @@
-name: "Example Action"
+name: Example Node Action with Post Step
+description: "An example GitHub Action with a post step"
 inputs:
   name:
     description: "The name to greet"
