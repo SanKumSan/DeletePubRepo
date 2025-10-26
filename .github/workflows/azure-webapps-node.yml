@@ -51,6 +51,7 @@ jobs:
         with:
           key: publish-2c114ba283895a804d2c845504d2e4ad5d0d3e05 #publish-${{ github.sha }} #${{ needs.publish.outputs.cache-key }}
           path: ${{ env.PUBLISH_DIR }}
+          restore-keys: publish-
 
       - name: Verify publish folder
         run: |
