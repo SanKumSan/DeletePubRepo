@@ -49,6 +49,7 @@ jobs:
         uses: actions/cache@v4
         with:
           key: publish-${{ github.sha }} #${{ needs.publish.outputs.cache-key }}
+          path: ${{ env.PUBLISH_DIR }}
 
       - name: Verify publish folder
         run: |
