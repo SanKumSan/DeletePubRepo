@@ -90,6 +90,16 @@ jobs:
     #environment:
     #  name: 'MyProd'
     steps:
+    - name: Check artifact directory
+      id: check_artifact
+      run: |
+        # set GITHUB_OUTPUT variable to indicate whether ./artifact exists and is non-empty
+        if [ -d ./artifact ] && [ "$(ls -A ./artifact)" ]; then
+          echo "artifact_present=true" >> $GITHUB_OUTPUT
+        else
+          echo "artifact_present=false" >> $GITHUB_OUTPUT
+        fi
+
     - name: Checkout
       uses: actions/checkout@v5
     - name: Just Run Mate
@@ -104,6 +114,7 @@ jobs:
         echo "printing directly from the file mate $(cat ./.github/actions/my-post-action/cleanup.js)"
 
     - name: Create static artifact
+      if: steps.check_artifact.outputs.artifact_present == 'false'
       run: |
         mkdir -p ./artifact/static
         # create the file only if it does not already exist (makes the step idempotent for retries)
@@ -114,16 +125,6 @@ jobs:
         else
           echo "hello.txt already exists; skipping creation"
           ls -la ./artifact/static
-        fi
-
-    - name: Check artifact directory
-      id: check_artifact
-      run: |
-        # set GITHUB_OUTPUT variable to indicate whether ./artifact exists and is non-empty
-        if [ -d ./artifact ] && [ "$(ls -A ./artifact)" ]; then
-          echo "artifact_present=true" >> $GITHUB_OUTPUT
-        else
-          echo "artifact_present=false" >> $GITHUB_OUTPUT
         fi
 
     - name: Download artifact from build job
@@ -146,7 +147,7 @@ jobs:
         name: node-app
 
     - name: 'Deploy to Azure WebApp'
-      if: true
+      if: false
       id: deploy-to-webapp
       uses: azure/webapps-deploy@v2
       with:
