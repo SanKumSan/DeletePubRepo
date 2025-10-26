@@ -15,11 +15,13 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Create static artifact if nothing was downloaded
+        env:
+          publish_DIR1: ${{ env.PUBLISH_DIR }}
         run: |
             echo "Publishing application..."
-            mkdir -p $PUBLISH_DIR
-            echo "Sample content" > $PUBLISH_DIR/index.html
-            echo "Published to $PUBLISH_DIR"
+            mkdir -p $publish_DIR1
+            echo "Sample content" > $publish_DIR1/index.html
+            echo "Published to $publish_DIR1"
 
       - name: Cache publish folder
         id: set-cache
