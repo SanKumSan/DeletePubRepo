@@ -96,8 +96,10 @@ jobs:
         # set GITHUB_OUTPUT variable to indicate whether ./artifact exists and is non-empty
         if [ -d ./artifact ] && [ "$(ls -A ./artifact)" ]; then
           echo "artifact_present=true" >> $GITHUB_OUTPUT
+          echo "Artifact directory exists and is not empty."
         else
           echo "artifact_present=false" >> $GITHUB_OUTPUT
+          echo "Artifact directory does not exist or is empty."
         fi
 
     - name: Checkout
@@ -115,7 +117,11 @@ jobs:
 
     - name: Create static artifact
       if: steps.check_artifact.outputs.artifact_present == 'false'
+      env:
+        ARTIFACT_PRESENT: ${{ steps.check_artifact.outputs.artifact_present }}
       run: |
+        echo "Artifact present: $ARTIFACT_PRESENT"
+
         mkdir -p ./artifact/static
         # create the file only if it does not already exist (makes the step idempotent for retries)
         if [ ! -f ./artifact/static/hello.txt ]; then
@@ -128,7 +134,7 @@ jobs:
         fi
 
     - name: Download artifact from build job
-      if: true
+      # if: steps.check_artifact.outputs.artifact_present == 'false'
       uses: ./.github/actions/my-post-action
       with:
         name: testpostactions
@@ -141,7 +147,7 @@ jobs:
         path: ./artifact
     
     - name: Download artifact from build job
-      if: true
+      if: steps.check_artifact.outputs.artifact_present == 'true'
       uses: actions/download-artifact@v4
       with:
         name: node-app
