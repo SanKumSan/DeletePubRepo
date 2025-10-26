@@ -29,6 +29,12 @@ jobs:
           key: publish-${{ github.sha }}
           restore-keys: publish-
 
+      # Set the cache key as an output
+      - name: Set cache key output
+        run: |
+          echo "cache-key=publish-${{ github.sha }}" >> $GITHUB_OUTPUT
+        id: set-cache
+
   upload:
     needs: publish
     runs-on: ubuntu-latest
