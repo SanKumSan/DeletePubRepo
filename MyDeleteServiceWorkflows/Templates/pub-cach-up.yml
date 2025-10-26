@@ -20,6 +20,7 @@ jobs:
             mkdir -p $PUBLISH_DIR
             echo "Sample content" > $PUBLISH_DIR/index.html
             echo "Published to $PUBLISH_DIR"
+            sleep 20
 
       - name: Cache publish folder
         id: set-cache
