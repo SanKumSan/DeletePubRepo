@@ -98,8 +98,25 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: node-app
-        path: ./artifact
+        path: ./
       continue-on-error: true # do not fail the job if the artifact is not found
+
+    - name: Extract downloaded artifact if it exists
+      id: extract
+      run: |
+        if [ -f node-app.zip ]; then
+          echo "Extracting downloaded artifact..."
+          mkdir -p ./artifact
+          cd ./artifact
+          unzip ../node-app.zip
+          cd ..
+          echo "Extracted contents:"
+          ls -la ./artifact
+          echo "artifact_exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "No zip file found to extract"
+          echo "artifact_exists=false" >> $GITHUB_OUTPUT
+        fi
 
     - name: Create static artifact if nothing was downloaded
       run: |
@@ -120,13 +137,22 @@ jobs:
       uses: ./.github/actions/my-post-action
       with:
         name: testpostactions
+
+    - name: Compress artifact directory
+      run: |
+        echo "Compressing artifact directory..."
+        cd ./artifact
+        zip -r ../node-app.zip .
+        cd ..
+        echo "Compressed size:"
+        ls -lh node-app.zip
         
     - name: Upload artifact from build job
       #if: steps.check_artifact.outputs.artifact_present == 'true'
       uses: actions/upload-artifact@v4
       with:
         name: node-app
-        path: ./artifact
+        path: node-app.zip
     
     # - name: Download artifact from build job
     #   #if: steps.check_artifact.outputs.artifact_present == 'true'
