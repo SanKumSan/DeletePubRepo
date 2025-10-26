@@ -1,1 +1,1 @@
-console.log(`Goodbye ${process.env.name}! (from cleanup.js)`);
+console.log(`Goodbye Post stpe done (from cleanup.js)`);

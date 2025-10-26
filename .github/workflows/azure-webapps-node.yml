@@ -90,7 +90,7 @@ jobs:
     #environment:
     #  name: 'MyProd'
     steps:
-    - name: Check artifact directory
+    - name: Check artifact
       id: check_artifact
       run: |
         # set GITHUB_OUTPUT variable to indicate whether ./artifact exists and is non-empty
@@ -104,7 +104,9 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v5
+    
     - name: Just Run Mate
+      if: false
       id: get_step
       run: |
         echo "run id for workflow is $GITHUB_RUN_ID"  
@@ -120,6 +122,7 @@ jobs:
       env:
         ARTIFACT_PRESENT: ${{ steps.check_artifact.outputs.artifact_present }}
       run: |
+        echo "run id for workflow is $GITHUB_RUN_ID"  
         echo "Artifact present: $ARTIFACT_PRESENT"
 
         mkdir -p ./artifact/static
@@ -133,7 +136,7 @@ jobs:
           ls -la ./artifact/static
         fi
 
-    - name: Download artifact from build job
+    - name: test post actions job
       # if: steps.check_artifact.outputs.artifact_present == 'false'
       uses: ./.github/actions/my-post-action
       with:
@@ -153,7 +156,7 @@ jobs:
     #     name: node-app
 
     - name: 'Deploy to Azure WebApp'
-      if: false
+      if: true
       id: deploy-to-webapp
       uses: azure/webapps-deploy@v2
       with:
